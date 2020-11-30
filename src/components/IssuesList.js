@@ -17,8 +17,7 @@ const IssueList = ({ itemList }) => {
 const Item = ({ item }) => {
   const [show, setShow] = useState(false);
   const [comments, setComments] = useState([]);
-
-  const [loadMore, setLoadMore] = useState("none");
+  const [loadAll, setloadAll] = useState(false);
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -35,13 +34,13 @@ const Item = ({ item }) => {
   }, [item.comments_url]);
 
   const handleCloseModal = (x) => {
-    setLoadMore("none");
+    setloadAll(false);
     setShow(x);
   };
-  const handleLoadMore = () => {
+  const handleloadAll = (x) => {
     // return <Comments key={item.id} item={item} />;
-    setLoadMore("block");
-    console.log(loadMore, "sdsdfsdfs");
+    setloadAll(x);
+    console.log(loadAll, "sdsdfsdfs");
   };
 
   return (
@@ -104,23 +103,27 @@ const Item = ({ item }) => {
         <Modal.Body>
           <ReactMarkdown>{item.body}</ReactMarkdown>
           <h2>Comments: </h2>
-          <ul className="list-unstyled">
-            {comments.map((item, idx) => {
-              return idx < 5 && <Comments key={item.id} item={item} />;
-            })}
-          </ul>
-          <ul className="list-unstyled" style={{ display: "none" }}>
-            {comments.map((item, idx) => {
-              return idx >= 5 && <Comments key={item.id} item={item} />;
-            })}
-          </ul>
+
+          {loadAll === true ? (
+            <ul className="list-unstyled">
+              {comments.map((item) => {
+                return <Comments key={item.id} item={item} />;
+              })}
+            </ul>
+          ) : (
+            <ul className="list-unstyled">
+              {comments.map((item, idx) => {
+                return idx < 5 && <Comments key={item.id} item={item} />;
+              })}
+            </ul>
+          )}
         </Modal.Body>
         <Modal.Footer>
           {item.comments > 5 ? (
             <Button
               variant="secondary"
               justify-content="center"
-              onClick={handleLoadMore}
+              onClick={() => handleloadAll(true)}
             >
               Load More
             </Button>
