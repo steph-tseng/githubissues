@@ -17,9 +17,8 @@ const IssueList = ({ itemList }) => {
 const Item = ({ item }) => {
   const [show, setShow] = useState(false);
   const [comments, setComments] = useState([]);
-  const [commentSet, setCommentSet] = useState([]);
-  const [commentNum, setCommentNum] = useState([]);
 
+  const [loadMore, setLoadMore] = useState("none");
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -27,7 +26,6 @@ const Item = ({ item }) => {
         const res = await fetch(url);
         const data = await res.json();
         setComments(data);
-        setCommentSet(data.slice(0, 5));
         // console.log(data);
       } catch (error) {
         console.log(error);
@@ -36,8 +34,14 @@ const Item = ({ item }) => {
     fetchComments();
   }, [item.comments_url]);
 
+  const handleCloseModal = (x) => {
+    setLoadMore("none");
+    setShow(x);
+  };
   const handleLoadMore = () => {
-    return <Comments key={item.id} item={item} />;
+    // return <Comments key={item.id} item={item} />;
+    setLoadMore("block");
+    console.log(loadMore, "sdsdfsdfs");
   };
 
   return (
@@ -92,7 +96,7 @@ const Item = ({ item }) => {
         centered
         scrollable={true}
         show={show}
-        onHide={() => setShow(false)}
+        onHide={() => handleCloseModal(false)}
       >
         <Modal.Header closeButton>
           <Modal.Title>{item.title}</Modal.Title>
@@ -101,8 +105,13 @@ const Item = ({ item }) => {
           <ReactMarkdown>{item.body}</ReactMarkdown>
           <h2>Comments: </h2>
           <ul className="list-unstyled">
-            {comments.map((item) => {
-              return <Comments key={item.id} item={item} />;
+            {comments.map((item, idx) => {
+              return idx < 5 && <Comments key={item.id} item={item} />;
+            })}
+          </ul>
+          <ul className="list-unstyled" style={{ display: "none" }}>
+            {comments.map((item, idx) => {
+              return idx >= 5 && <Comments key={item.id} item={item} />;
             })}
           </ul>
         </Modal.Body>
